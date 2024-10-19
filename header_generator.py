@@ -16,9 +16,8 @@ async def on_request(params, global_conn):
         content = file.read()
     index = int(content)
     
-    if "telemetry" not in params["request"]["url"] and "https://identity.o2.co.uk/auth/password_o2" in params["request"]["url"]:
-        with open(f'result/data{index}.json', 'w') as json_file:
-            json.dump(params, json_file)
+    with open(f'result/data{index}.json', 'w') as json_file:
+        json.dump(params, json_file)
 
     index += 1
     print(index)
@@ -72,7 +71,6 @@ async def on_request(params, global_conn):
 
 async def main():
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless=new')
     async with webdriver.Chrome(max_ws_size=2 ** 30, options=options) as driver:
         driver.base_target.socket.on_closed.append(lambda code, reason: print(f"chrome exited"))
 
@@ -82,28 +80,6 @@ async def main():
         await global_conn.add_cdp_listener("Fetch.requestPaused", lambda data: on_request(data, global_conn))
 
         await driver.get("https://accounts.o2.co.uk/signin", timeout=60, wait_load=False)
-        
-        while True:
-            try:
-                allow_cookie_button = await driver.find_element(By.CSS_SELECTOR, "button[aria-label=\"Accept all cookies button\"]")
-                await allow_cookie_button.click()
-                break
-            except:
-                await asyncio.sleep(0.2)
-                
-        await asyncio.sleep(2)
-        USERNAME = "sdfwer23"
-        PASSWORD = "sdfwer23"
-        username_input = await driver.find_element(By.CSS_SELECTOR, "input[id=\"username\"]")
-        await username_input.write(USERNAME)
-        password_input = await driver.find_element(By.CSS_SELECTOR, "input[id=\"password\"]")
-        await password_input.write(PASSWORD)
-
-        signin_button = await driver.find_element(By.CSS_SELECTOR, "input[value=\"Sign in\"]")
-        await signin_button.click()
-
         await asyncio.sleep(5000)
-
-
 
 asyncio.run(main())
