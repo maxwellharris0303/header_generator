@@ -1,6 +1,7 @@
 import asyncio
 import requests
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from threading import Thread, Event
 from queue import Queue
 import base64
@@ -14,6 +15,7 @@ import json
 import os
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 # A queue to store the result
 result_queue = Queue()
@@ -122,7 +124,7 @@ def run_async(username, password):
     result_queue.put(result)  # Put the result in the queue
 
 # Route to trigger the async function in the background and get the result
-@app.route('/get_popdata', methods=['GET'])
+@app.route('/get_popdata', methods=['POST'])
 def run_async_task():
     data = request.get_json()
     print(data)
