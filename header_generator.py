@@ -63,11 +63,11 @@ async def on_request(params, global_conn):
                 fulfill_params["responsePhrase"] = params["responseStatusText"]
 
             _time = time.perf_counter() - start
-            if _time > 0.01:
+            if _time > 1:
                 print(f"decoding took long: {_time} s")
             await global_conn.execute_cdp_cmd("Fetch.fulfillRequest", fulfill_params)
             # print("Mocked response", url)
-
+    print(_params)
 
 async def main():
     options = webdriver.ChromeOptions()
@@ -79,7 +79,7 @@ async def main():
                                           cmd_args={"patterns": [{"requestStage": "Response", "urlPattern": "*"}]}, timeout=100)
         await global_conn.add_cdp_listener("Fetch.requestPaused", lambda data: on_request(data, global_conn))
 
-        await driver.get("https://accounts.o2.co.uk/signin", timeout=60, wait_load=False)
+        await driver.get("https://abrahamjuliot.github.io/creepjs/", timeout=60, wait_load=False)
         await asyncio.sleep(5000)
 
 asyncio.run(main())
